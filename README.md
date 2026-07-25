@@ -87,7 +87,7 @@ const results = codes.filter(c => c.spn === '520542');
 - ⚡ **Тренажёр «Электрика SITRAK»** — считаешь сечение и падение прямо на месте, читаешь схему цепи, разбираешь обжим, сдаёшь тест. Начинаешь понимать машину целиком → [megadata.pro/electrika](https://megadata.pro/electrika)
 - 🤖 **Бот-диагност** (коды + разбор, 24/7):
   - Telegram → [@megamechanika_bot](https://t.me/megamechanika_bot)
-  - MAX → [max.ru/id6318226040_2_bot](https://max.ru/id6318226040_2_bot)
+  - MAX → [max.ru/id6318226040_bot](https://max.ru/id6318226040_bot)
 - 📡 **Канал «МегаМеханика SITRAK»** — инженерные разборы систем → [t.me/MegaMehanika_sitrak_remont](https://t.me/MegaMehanika_sitrak_remont)
 
 ## Для автопарков и разработчиков
