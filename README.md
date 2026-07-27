@@ -3,26 +3,26 @@
 Открытая база кодов ошибок (DTC) для грузовиков **SITRAK C7H · C9H · G7**.
 Часть открытой экосреды **МегаДата** для диагностики грузового транспорта.
 
-**7847 кодов** по 37 системам: Bosch ECU (MC11/MC13), ZF TraXon, KNORR EBS, WABCO EBS, ECAS, ABS, NanoBCU и другие.
+**8042 кода** по 44 системам: Bosch ECU (MC11/MC13), ZF TraXon, KNORR EBS, WABCO EBS, ECAS, ABS, NanoBCU и другие.
 
-![codes](https://img.shields.io/badge/DTC-7847-blue) ![systems](https://img.shields.io/badge/систем-37-blue) ![license](https://img.shields.io/badge/license-CC%20BY%204.0-green)
+![codes](https://img.shields.io/badge/DTC-8042-blue) ![systems](https://img.shields.io/badge/систем-44-blue) ![license](https://img.shields.io/badge/license-CC%20BY%204.0-green)
 
 ---
 
 ## Зачем это
 
-Сканер показывает код — это только **«что»**. Здесь — расшифровка SPN / FMI / DTC на русском и английском, чтобы понять, о чём говорит машина. А **куда копать дальше** (где мерить, какие пины, схема цепи) — в инструментах экосреды ниже.
+Сканер показывает код — это только **«что»**. Здесь — расшифровка SPN / FMI / DTC, чтобы понять, о чём говорит машина. А **куда копать дальше** (где мерить, какие пины, схема цепи, норма на приборе) — в инструментах экосреды ниже.
 
 ## Формат данных
 
 ```json
 {
-  "spn": "520542",
-  "fmi": "2",
-  "dtc": "350",
-  "description": "AGD switched to manual mode because ABS is not fully operational",
-  "description_ru": "AGD переключен в ручной режим, потому что ABS не работает полностью",
-  "system": "AMT"
+  "spn": "101",
+  "fmi": "0",
+  "dtc": "P051A",
+  "system": "Bosch",
+  "description_ru": "Давление датчика давления картера коленчатого вала выше верхнего предела",
+  "description_en": "SRC High for crank case pressure sensor"
 }
 ```
 
@@ -31,42 +31,52 @@
 | `spn` | Suspect Parameter Number (стандарт SAE J1939) |
 | `fmi` | Failure Mode Identifier |
 | `dtc` | Diagnostic Trouble Code |
-| `description` | Описание ошибки (EN) |
-| `description_ru` | Описание ошибки (RU) |
 | `system` | Блок управления / система |
+| `description_ru` | Описание на русском — **7635 записей** |
+| `description_en` | Заводское описание на английском — **2441 запись**, поле есть не везде |
 
-## Основные системы
+Русское описание есть почти у каждого кода, английский оригинал — у части систем: там, где заводская таблица была англоязычной. Если текста на языке нет, поля просто нет — заглушек и подстановок в базе не держим.
 
-| Система | Кодов | Описание |
-|---------|-------|----------|
-| Bosch | 2257 | Двигатель MC11 / MC13, EDC17 |
-| KNORREBS | 1192 | Тормозная система KNORR EBS |
-| OGP / OGP2 | 754 | Панель приборов |
-| AMT | 430 | Коробка передач (ZF TraXon) |
-| EBS | 357 | Электронная тормозная система |
-| WABCO_EBS31 | 315 | WABCO EBS поколение 31 |
-| ZF_GearBox | 301 | Коробка ZF |
-| ABS / KNORRABS8 | 396 | Антиблокировочная система |
-| ECAS / ECAS4PLUS | 295 | Пневмоподвеска |
-| BCU / NanoBCU | 300+ | Блок управления кузовом |
-| PCU | 163 | Блок управления мощностью |
+## Системы
+
+| Группа | Кодов |
+|--------|-------|
+| Bosch — двигатель MC11 / MC13, EDC17 | 2266 |
+| KNORR — EBS и ABS | 1588 |
+| WABCO EBS | 887 |
+| Коробка передач — AMT / ZF TraXon | 782 |
+| Панель приборов OGP | 754 |
+| Кузовная электроника BCU / NanoBCU | 571 |
+| Пневмоподвеска ECAS | 307 |
+| SCR / AdBlue / EGR | 267 |
+| Мощность PCU | 163 |
+| ABS | 160 |
+| Ретардеры — ZF, Voith, FST | 102 |
+| PEPS, ключ, SAM, GPS | 69 |
+| ADAS — радар, ADCU, LDWS | 63 |
+| VCU | 63 |
 
 ## Использование
 
 ```python
 import json
 
-with open('error-codes.json', 'r', encoding='utf-8') as f:
+with open('error-codes.json', encoding='utf-8') as f:
     codes = json.load(f)
 
-# Поиск по SPN
-results = [c for c in codes if c.get('spn') == '520542']
+# один SPN может встречаться в разных системах — это разные неисправности
+for c in [c for c in codes if c['spn'] == '520542']:
+    print(c['system'], '·', c.get('description_ru'))
+# AMT   · AGD переключен в ручной режим, потому что ABS не работает полностью...
+# Bosch · Предел системы наддува рельса (Меньше)
 ```
 
 ```javascript
 const codes = require('./error-codes.json');
-const results = codes.filter(c => c.spn === '520542');
+const results = codes.filter(c => c.spn === '520542' && c.system === 'Bosch');
 ```
+
+⚠️ **Ищите по паре SPN + система, а не по одному SPN.** Производители блоков используют одни и те же номера параметров для разных неисправностей: 520542 у коробки AMT и у двигателя Bosch — два не связанных между собой дефекта.
 
 ---
 
@@ -96,10 +106,10 @@ const results = codes.filter(c => c.spn === '520542');
 
 ## Пополнение базы
 
-База живёт и пополняется из реальной практики ремонта. Нашли неточность или код, которого нет:
+База живёт и пополняется из реальной практики ремонта. Часть русских описаний — перевод заводских таблиц, местами машинный; вычитываем по мере работы с кодами. Нашли неточность, кривую формулировку или код, которого нет:
 
 - откройте **[Issue](https://github.com/STAS63-bit/sitrak-error-codes/issues)** в этом репозитории, либо
-- напишите боту — сверим и добавим.
+- напишите боту — сверим по заводской документации и добавим.
 
 Строим открытую базу знаний по SITRAK вместе. Присоединяйтесь.
 

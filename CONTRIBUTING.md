@@ -2,7 +2,7 @@
 
 ## Missing data / Недостающие данные
 
-~209 error codes are missing FMI (Failure Mode Identifier) values. You can help!
+~180 error codes are missing FMI (Failure Mode Identifier) values. You can help!
 
 ### How to contribute
 
@@ -23,9 +23,9 @@
   "spn": "0025",
   "fmi": "4",
   "dtc": "025-4",
-  "description": "Fan drive malfunction",
+  "system": "Bosch",
   "description_ru": "Неисправность привода вентилятора",
-  "system": "Bosch"
+  "description_en": "Fan drive malfunction"
 }
 ```
 
@@ -34,12 +34,11 @@
 | System | Missing |
 |--------|---------|
 | SCR | 60 |
-| ZF_GearBox | 51 |
+| ZF_GearBox | 50 |
 | HR_Radar | 45 |
-| Bosch | 26 |
 | WABCO_EBS31 | 17 |
-| GPS | 8 |
-| Other | 2 |
+| GPS | 7 |
+| ECAS | 1 |
 
 ### Rules
 
